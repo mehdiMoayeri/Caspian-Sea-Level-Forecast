@@ -8,7 +8,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 
-# بررسی وجود کتابخانه Plotly برای نمودارهای تعاملی؛ در صورت عدم نصب، استفاده خودکار از Matplotlib
 try:
     import plotly.graph_objects as go
     import plotly.express as px
@@ -17,7 +16,7 @@ except ImportError:
     PLOTLY_AVAILABLE = False
 
 # ==============================================================================
-# ۱. تنظیمات صفحه و استایل راست‌به‌چپ (RTL) فارسی برای داشبورد مدیریتی
+# ۱. تنظیمات صفحه، فونت فارسی وزیرمتن (Vazirmatn) و پوسته گرافیکی حرفه‌ای RTL
 # ==============================================================================
 st.set_page_config(
     page_title="سامانه پایش و پیش‌بینی ۱۲ ماهه تراز دریای خزر",
@@ -29,40 +28,141 @@ st.set_page_config(
 st.markdown(
     """
     <style>
+    @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
+
+    /* اعمال فونت وزیرمتن روی تمامی اجزای سامانه */
+    html, body, [class*="css"], .stMarkdown, .stText, .stButton button, .stSelectbox, .stSlider {
+        font-family: 'Vazirmatn', 'Tahoma', sans-serif !important;
+    }
+
+    /* راست‌به‌چپ سازی متون و باکس‌های فارسی */
     .main-header {
-        background: linear-gradient(90deg, #0a2540 0%, #1d4ed8 100%);
+        background: linear-gradient(135deg, #071930 0%, #1e3a8a 60%, #1d4ed8 100%);
         color: white;
-        padding: 1.2rem 1.8rem;
-        border-radius: 12px;
-        margin-bottom: 1.2rem;
+        padding: 1.4rem 2rem;
+        border-radius: 14px;
+        margin-bottom: 1.4rem;
         direction: rtl;
         text-align: right;
+        box-shadow: 0 4px 15px rgba(15, 23, 42, 0.15);
+        border-right: 6px solid #38bdf8;
     }
     .main-header h1 {
-        color: white !important;
-        font-size: 1.65rem;
-        margin-bottom: 0.3rem;
+        color: #ffffff !important;
+        font-family: 'Vazirmatn', sans-serif !important;
+        font-size: 1.65rem !important;
+        font-weight: 800 !important;
+        margin-bottom: 0.45rem;
+        line-height: 1.5;
     }
     .main-header p {
-        color: #e2e8f0;
+        color: #e0f2fe;
         font-size: 0.95rem;
+        font-weight: 400;
         margin: 0;
+        line-height: 1.6;
     }
+
+    /* باکس‌های راهنما و توضیحات تب‌ها */
     .rtl-box {
         direction: rtl;
         text-align: right;
         background-color: #f8fafc;
-        border-right: 5px solid #1d4ed8;
-        padding: 1rem 1.2rem;
-        border-radius: 8px;
-        margin-bottom: 1rem;
-    }
-    div[data-testid="stMetric"] {
-        background-color: #ffffff;
         border: 1px solid #e2e8f0;
-        padding: 12px 16px;
+        border-right: 5px solid #2563eb;
+        padding: 1.1rem 1.4rem;
         border-radius: 10px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        margin-bottom: 1.2rem;
+        font-size: 0.95rem;
+        line-height: 1.85;
+        color: #1e293b;
+    }
+
+    /* طراحی کارت‌های شاخص (KPI Cards) بدون بریده شدن متن */
+    .kpi-card {
+        background-color: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-top: 4px solid #1d4ed8;
+        border-radius: 12px;
+        padding: 14px 16px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        direction: rtl;
+        text-align: right;
+        height: 100%;
+    }
+    .kpi-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+    .kpi-value {
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: #0f172a;
+        direction: ltr;
+        text-align: right;
+        margin-bottom: 6px;
+    }
+    .kpi-delta {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 6px;
+        background-color: #f1f5f9;
+        color: #334155;
+    }
+
+    /* استایل برجسته و دکمه‌ای برای تب‌های ۵گانه */
+    div[data-baseweb="tab-list"] {
+        direction: rtl;
+        gap: 10px;
+        background-color: #f1f5f9;
+        padding: 8px 10px;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        margin-top: 1rem;
+        margin-bottom: 1.2rem;
+        flex-wrap: wrap;
+    }
+    button[data-baseweb="tab"] {
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        border-radius: 9px !important;
+        padding: 10px 18px !important;
+        font-family: 'Vazirmatn', sans-serif !important;
+        font-size: 0.96rem !important;
+        font-weight: 700 !important;
+        color: #334155 !important;
+        transition: all 0.2s ease-in-out !important;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.03) !important;
+    }
+    button[data-baseweb="tab"]:hover {
+        border-color: #2563eb !important;
+        color: #1d4ed8 !important;
+        background-color: #eff6ff !important;
+    }
+    button[data-baseweb="tab"][aria-selected="true"] {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%) !important;
+        color: #ffffff !important;
+        border-color: #1e3a8a !important;
+        box-shadow: 0 4px 10px rgba(37, 99, 235, 0.28) !important;
+    }
+
+    /* راست‌چین کردن عناوین بخش‌ها و نوار کناری */
+    h2, h3, h4, h5, h6 {
+        direction: rtl;
+        text-align: right;
+        font-family: 'Vazirmatn', sans-serif !important;
+        font-weight: 700 !important;
+        color: #0f172a;
+    }
+    section[data-testid="stSidebar"] {
+        direction: rtl;
+        text-align: right;
+        background-color: #f8fafc;
     }
     </style>
     """,
@@ -74,7 +174,7 @@ st.markdown(
     """
     <div class="main-header">
         <h1>🌊 سامانه عملیاتی پایش و پیش‌بینی احتمالاتی ۱۲ ماهه تراز آب دریای خزر (فاز دوم)</h1>
-        <p>مرکز مطالعات و تحقیقات دریای خزر | معماری ترکیبی: سامانه دینامیکی GloFAS v4.0 (افق ۱ تا ۶ ماه) + شبکه عصبی عمیق LSTM (افق ۱ تا ۱۲ ماه) + مدل بیلان آب و منحنی هیپسومتریک</p>
+        <p>مرکز مطالعات و تحقیقات دریای خزر | ترکیب هوشمند سامانه دینامیکی GloFAS v4.0 (افق ۱ تا ۶ ماه)، شبکه عصبی عمیق LSTM (افق ۱ تا ۱۲ ماه) و مدل بیلان آب دریای خزر</p>
     </div>
     """,
     unsafe_allow_html=True,
@@ -87,31 +187,28 @@ st.markdown(
 def load_bundle_from_path(filepath: str):
     with open(filepath, "rb") as f:
         data = pickle.load(f)
-    # اطمینان از فرمت تاریخ در تمام جداول
     for k in ["historical_master", "glofas_seasonal_6m", "dl_forecast_12m", "ensemble_inflow_12m", "csl_forecast_12m"]:
         if k in data and "Date" in data[k].columns:
             data[k]["Date"] = pd.to_datetime(data[k]["Date"])
     return data
 
 default_paths = [
-    Path("./Caspian_Phase2_Database/08_API_JSON_GeoJSON_NetCDF/caspian_streamlit_bundle.pkl"),
     Path("./caspian_streamlit_bundle.pkl"),
+    Path("./Caspian_Phase2_Database/08_API_JSON_GeoJSON_NetCDF/caspian_streamlit_bundle.pkl"),
     Path("../Caspian_Phase2_Database/08_API_JSON_GeoJSON_NetCDF/caspian_streamlit_bundle.pkl"),
 ]
 
 bundle = None
-loaded_path_str = None
 for p in default_paths:
     if p.is_file():
         bundle = load_bundle_from_path(str(p))
-        loaded_path_str = str(p.resolve())
         break
 
 with st.sidebar:
     st.markdown("### ⚙️ تنظیمات سامانه و سناریوها")
     if bundle is None:
-        st.warning("فایل `caspian_streamlit_bundle.pkl` در مسیر پیش‌فرض یافت نشد. لطفاً آن را در کادر زیر آپلود کنید:")
-        uploaded_pkl = st.file_uploader("انتخاب فایل caspian_streamlit_bundle.pkl", type=["pkl"])
+        st.warning("فایل `caspian_streamlit_bundle.pkl` یافت نشد. لطفاً آن را بارگذاری کنید:")
+        uploaded_pkl = st.file_uploader("انتخاب فایل pkl", type=["pkl"])
         if uploaded_pkl is not None:
             bundle = pickle.load(uploaded_pkl)
             for k in ["historical_master", "glofas_seasonal_6m", "dl_forecast_12m", "ensemble_inflow_12m", "csl_forecast_12m"]:
@@ -121,7 +218,7 @@ with st.sidebar:
         st.success("✅ متصل به پایگاه داده یکپارچه فاز دوم")
 
 if bundle is None:
-    st.info("لطفاً فایل `caspian_streamlit_bundle.pkl` را کنار فایل `app.py` قرار دهید یا از منوی سمت چپ بارگذاری نمایید.")
+    st.info("لطفاً فایل `caspian_streamlit_bundle.pkl` را کنار فایل `app.py` قرار دهید.")
     st.stop()
 
 # استخراج جداول از بسته داده
@@ -135,28 +232,28 @@ df_csl_12m  = bundle["csl_forecast_12m"].copy()
 df_skill    = bundle["hindcast_skill"]
 df_lag_corr = bundle["lag_correlations"]
 df_hypso    = bundle["hypsometry"].sort_values("Elevation_m_BS").reset_index(drop=True)
-csl_mc_base = bundle["csl_mc_paths"]  # ابعاد: (1000, 12)
+csl_mc_base = bundle["csl_mc_paths"]
 
 initial_csl_m = float(df_master.iloc[-1]["CSL_Satellite_Altimetry_m"])
 
 # ==============================================================================
-# ۳. کنترلرهای تعاملی نوار کناری (آستانه‌های ریسک و شبیه‌ساز سناریوی What-If)
+# ۳. کنترلرهای تعاملی نوار کناری
 # ==============================================================================
 with st.sidebar:
     st.markdown("---")
-    st.markdown("#### 🚨 ۱. تنظیم آستانه‌های هشدار و بحران تراز")
+    st.markdown("#### 🚨 ۱. تنظیم آستانه‌های هشدار و بحران")
     warn_thresh = st.slider(
-        "آستانه هشدار زرد (m BS):",
+        "آستانه هشدار زرد (متر بالتیک):",
         min_value=-29.60, max_value=-28.80, value=-29.30, step=0.01, format="%.2f"
     )
     crit_thresh = st.slider(
-        "آستانه بحرانی قرمز (m BS):",
+        "آستانه بحرانی قرمز (متر بالتیک):",
         min_value=-29.70, max_value=-28.90, value=-29.38, step=0.01, format="%.2f"
     )
 
     st.markdown("---")
-    st.markdown("#### 🎛️ ۲. شبیه‌ساز سناریوهای مدیریتی (What-If)")
-    st.caption("تغییر پارامترهای ورودی برای بررسی حساسیت تراز خزر در ۱۲ ماه آینده:")
+    st.markdown("#### 🎛️ ۲. شبیه‌ساز سناریوهای مدیریتی")
+    st.caption("بررسی اثر تغییر ورودی‌ها بر تراز ۱۲ ماه آینده دریای خزر:")
     inflow_pct_change = st.slider(
         "تغییر دبی ورودی رودخانه‌ها (ولگا و غیره) [%]:",
         min_value=-40, max_value=40, value=0, step=5
@@ -175,32 +272,26 @@ with st.sidebar:
     )
 
 # ==============================================================================
-# ۴. محاسبه زنده سناریوی تعاملی (What-If) و به‌روزرسانی احتمال ریسک‌ها
+# ۴. محاسبه زنده سناریوی تعاملی (What-If)
 # ==============================================================================
 def get_area_km2(h_m):
     return float(np.interp(h_m, df_hypso["Elevation_m_BS"], df_hypso["Area_1000_km2"]) * 1000.0)
 
-# محاسبه مجدد تغییرات تراز تحت سناریوی انتخابی کاربر در نوار کناری
 scenario_delta_h = np.zeros(len(df_csl_12m))
 cum_dh_scen = 0.0
 for idx, row in df_csl_12m.iterrows():
     h_ref = row["CSL_P50_m (Median_Forecast)"]
     area_k = get_area_km2(h_ref)
-    
-    # حجم اضافه/کاهش یافته ناشی از تغییر درصد دبی، تبخیر و خروجی قره‌بوغاز
     dq_vol  = row["Inflow_Vol_km3"] * (inflow_pct_change / 100.0)
-    # برآورد حجم تبخیر پایه ماهانه از روی اقلیم‌شناسی
     m_num = row["Date"].month
     clim_evap_mm = float(df_clim.loc[df_clim["Month"] == m_num, "Clim_Evap_mm"].values[0]) * 1.56
     evap_vol_base = (clim_evap_mm / 1e6) * area_k
     de_vol  = -evap_vol_base * (evap_pct_change / 100.0)
     dkb_vol = -row["KaraBogaz_Outflow_km3"] * ((karabogaz_open_pct - 100.0) / 100.0)
-    
     dV_scen = dq_vol + de_vol + dkb_vol
     cum_dh_scen += (dV_scen / area_k) * 1000.0
     scenario_delta_h[idx] = cum_dh_scen
 
-# اعمال شیفت سناریو روی ۱۰۰۰ مسیر مونت‌کارلو و جدول پیش‌بینی ۱۲ ماهه
 csl_mc_adj = csl_mc_base + scenario_delta_h[np.newaxis, :]
 df_csl_12m["Scenario_P50_m"] = np.round(df_csl_12m["CSL_P50_m (Median_Forecast)"] + scenario_delta_h, 3)
 df_csl_12m["Scenario_P10_m"] = np.round(df_csl_12m["CSL_P10_m (Low_Level_Risk)"] + scenario_delta_h, 3)
@@ -209,68 +300,56 @@ df_csl_12m["Dynamic_Risk_Warn (%)"] = [round(float(np.mean(csl_mc_adj[:, i] < wa
 df_csl_12m["Dynamic_Risk_Crit (%)"] = [round(float(np.mean(csl_mc_adj[:, i] < crit_thresh) * 100.0), 1) for i in range(12)]
 
 # ==============================================================================
-# ۵. کارت‌های شاخص کلیدی عملکرد (Executive KPIs) در بالای داشبورد
+# ۵. کارت‌های شاخص کلیدی عملکرد (با طراحی سفارشی RTL بدون بریده شدن متن)
 # ==============================================================================
-m6_row  = df_csl_12m.iloc[5]   # ماه ۶ پیش‌بینی (مارس ۲۰۲۷)
-m12_row = df_csl_12m.iloc[11]  # ماه ۱۲ پیش‌بینی (سپتامبر ۲۰۲۷)
+m6_row  = df_csl_12m.iloc[5]
+m12_row = df_csl_12m.iloc[11]
 tot_12m_inflow_km3 = float(df_csl_12m["Inflow_Vol_km3"].sum()) * (1.0 + inflow_pct_change / 100.0)
 max_crit_risk_pct  = float(df_csl_12m["Dynamic_Risk_Crit (%)"].max())
+diff_6m_cm  = (m6_row["Scenario_P50_m"] - initial_csl_m) * 100.0
+diff_12m_cm = (m12_row["Scenario_P50_m"] - initial_csl_m) * 100.0
 
-kpi1, kpi2, kpi3, kpi4, kpi5 = st.columns(5)
-with kpi1:
-    st.metric(
-        label="📍 تراز اولیه دریا (سپتامبر ۲۰۲۶)",
-        value=f"{initial_csl_m:.3f} m",
-        delta="مبنای بالتیک (BS)",
-        delta_color="off"
-    )
-with kpi2:
-    diff_6m_cm = (m6_row["Scenario_P50_m"] - initial_csl_m) * 100.0
-    st.metric(
-        label="🔮 پیش‌بینی افق ۶ ماهه (P50 - مارس ۲۰۲۷)",
-        value=f"{m6_row['Scenario_P50_m']:.3f} m",
-        delta=f"{diff_6m_cm:+.1f} cm نسبت به شروع"
-    )
-with kpi3:
-    diff_12m_cm = (m12_row["Scenario_P50_m"] - initial_csl_m) * 100.0
-    st.metric(
-        label="🎯 پیش‌بینی افق ۱۲ ماهه (P50 - سپتامبر ۲۰۲۷)",
-        value=f"{m12_row['Scenario_P50_m']:.3f} m",
-        delta=f"{diff_12m_cm:+.1f} cm نسبت به شروع"
-    )
-with kpi4:
-    st.metric(
-        label="💧 مجموع ورودی رودخانه‌ها (۱۲ ماه آینده)",
-        value=f"{tot_12m_inflow_km3:.1f} km³",
-        delta=f"سناریوی دبی: {inflow_pct_change:+d}%"
-    )
-with kpi5:
-    st.metric(
-        label=f"⚠️ بیشینه ریسک عبور از آستانه بحران ({crit_thresh:.2f}m)",
-        value=f"{max_crit_risk_pct:.1f}%",
-        delta="در ماه دوازدهم افق پیش‌بینی",
-        delta_color="inverse"
-    )
+kpi_cols = st.columns(5)
+cards_data = [
+    ("📍 تراز اولیه دریا (سپتامبر ۲۰۲۶)", f"{initial_csl_m:.3f} m", "مبنای ارتفاعی بالتیک (BS)", "#e2e8f0", "#334155"),
+    ("🔮 پیش‌بینی افق ۶ ماهه (P50 - مارس ۲۰۲۷)", f"{m6_row['Scenario_P50_m']:.3f} m", f"تغییر نسبت به شروع: {diff_6m_cm:+.1f} cm", "#dcfce7" if diff_6m_cm >= 0 else "#fee2e2", "#166534" if diff_6m_cm >= 0 else "#991b1b"),
+    ("🎯 پیش‌بینی افق ۱۲ ماهه (P50 - سپتامبر ۲۰۲۷)", f"{m12_row['Scenario_P50_m']:.3f} m", f"تغییر نسبت به شروع: {diff_12m_cm:+.1f} cm", "#dcfce7" if diff_12m_cm >= 0 else "#fee2e2", "#166534" if diff_12m_cm >= 0 else "#991b1b"),
+    ("💧 مجموع ورودی رودخانه‌ها (۱۲ ماه آینده)", f"{tot_12m_inflow_km3:.1f} km³", f"سناریوی دبی ورودی: {inflow_pct_change:+d}%", "#dbeafe", "#1e40af"),
+    (f"⚠️ بیشینه ریسک عبور از آستانه بحران ({crit_thresh:.2f}m)", f"{max_crit_risk_pct:.1f}%", "در ماه دوازدهم افق پیش‌بینی", "#fef3c7" if max_crit_risk_pct < 25 else "#fee2e2", "#92400e" if max_crit_risk_pct < 25 else "#991b1b"),
+]
+
+for col_obj, (title_txt, val_txt, sub_txt, bg_c, fg_c) in zip(kpi_cols, cards_data):
+    with col_obj:
+        st.markdown(
+            f"""
+            <div class="kpi-card">
+                <div class="kpi-title">{title_txt}</div>
+                <div class="kpi-value">{val_txt}</div>
+                <div class="kpi-delta" style="background-color:{bg_c}; color:{fg_c};">{sub_txt}</div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 # ==============================================================================
-# ۶. ایجاد ۵ تب تخصصی منطبق بر اهداف پروپوزال
+# ۶. تب‌های ۵گانه برجسته (دکمه‌ای با فونت درشت)
 # ==============================================================================
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "📈 ۱. پیش‌بینی ۱۲ ماهه تراز خزر (Fan Chart)",
+    "📈 ۱. پیش‌بینی ۱۲ ماهه تراز خزر",
     "🏞️ ۲. پیش‌بینی دبی رودخانه‌ها (GloFAS + LSTM)",
-    "⚖️ ۳. بیلان آب، هیپسومتری و دورپیوندها",
-    "🎯 ۴. ارزیابی پس‌نگر و کارایی (Skill Score)",
-    "🔌 ۵. خروجی‌های API ملی و گزارش خودکار فصلی"
+    "⚖️ ۳. بیلان آب و دورپیوندهای اقلیمی",
+    "🎯 ۴. ارزیابی پس‌نگر و کارایی (Skill)",
+    "📥 ۵. دانلود گزارش فصلی و خروجی‌های ملی"
 ])
 
 # ------------------------------------------------------------------------------
-# تب ۱: پیش‌بینی احتمالاتی ۱۲ ماهه تراز آب دریای خزر و تحلیل عدم‌قطعیت
+# تب ۱: پیش‌بینی احتمالاتی ۱۲ ماهه تراز آب دریای خزر
 # ------------------------------------------------------------------------------
 with tab1:
     st.markdown(
         """
         <div class="rtl-box">
-        <b>تحلیل مدیریتی تراز ۱۲ ماهه:</b> نمودار بادبزنی (Fan Chart) زیر، پیش‌بینی احتمالاتی تراز سطح آب دریای خزر را از <b>اکتبر ۲۰۲۶ تا سپتامبر ۲۰۲۷</b> به همراه باندهای عدم‌قطعیت <b>P10 تا P90</b> (۹۰٪ اطمینان) و <b>P25 تا P75</b> (دامنه میان‌چارکی) نشان می‌دهد. در صورتی که از منوی سمت چپ، سناریوی مدیریتی (What-If) را تغییر دهید، منحنی خط‌چین قرمز رفتار تراز تحت سناریوی جدید را در مقایسه با شرایط پایه نمایش می‌دهد.
+        <b>تحلیل مدیریتی تراز ۱۲ ماهه:</b> نمودار بادبزنی (Fan Chart) زیر، پیش‌بینی احتمالاتی تراز سطح آب دریای خزر را از <b>اکتبر ۲۰۲۶ تا سپتامبر ۲۰۲۷</b> به همراه باندهای عدم‌قطعیت <b>P10 تا P90</b> (بازه اطمینان ۸۰٪) و <b>P25 تا P75</b> (دامنه میان‌چارکی) نشان می‌دهد. در صورت تغییر اسلایدرهای سناریوی مدیریتی در منوی سمت راست/چپ، منحنی خط‌چین قرمز رفتار تراز تحت سناریوی جدید را نمایش می‌دهد.
         </div>
         """,
         unsafe_allow_html=True
@@ -287,47 +366,42 @@ with tab1:
 
     if PLOTLY_AVAILABLE:
         fig_fan = go.Figure()
-        # سری تاریخی
         fig_fan.add_trace(go.Scatter(
             x=df_hist_sub["Date"], y=df_hist_sub["CSL_Satellite_Altimetry_m"],
             mode="lines", name="تراز تاریخی / آلتیمتری ماهواره‌ای",
-            line=dict(color="#0f172a", width=2.5)
+            line=dict(color="#0f172a", width=2.6)
         ))
-        # باند P10 - P90
         fig_fan.add_trace(go.Scatter(
             x=pd.concat([f_dates, f_dates[::-1]]),
             y=np.concatenate([p90_arr, p10_arr[::-1]]),
             fill="toself", fillcolor="rgba(59, 130, 246, 0.22)",
             line=dict(color="rgba(255,255,255,0)"),
-            name="باند عدم‌قطعیت P10 - P90"
+            name="باند عدم‌قطعیت P10 تا P90"
         ))
-        # باند P25 - P75
         fig_fan.add_trace(go.Scatter(
             x=pd.concat([f_dates, f_dates[::-1]]),
             y=np.concatenate([p75_arr, p25_arr[::-1]]),
-            fill="toself", fillcolor="rgba(37, 99, 235, 0.40)",
+            fill="toself", fillcolor="rgba(37, 99, 235, 0.42)",
             line=dict(color="rgba(255,255,255,0)"),
-            name="باند میان‌چارکی P25 - P75"
+            name="باند میان‌چارکی P25 تا P75"
         ))
-        # میانه پایه P50
         fig_fan.add_trace(go.Scatter(
             x=f_dates, y=p50_arr,
             mode="lines+markers", name="پیش‌بینی میانه پایه (P50)",
-            line=dict(color="#1e3a8a", width=3)
+            line=dict(color="#1e3a8a", width=3.2)
         ))
-        # منحنی سناریوی تعاملی در صورت تغییر اسلایدرها
         if inflow_pct_change != 0 or evap_pct_change != 0 or karabogaz_open_pct != 100:
             fig_fan.add_trace(go.Scatter(
                 x=f_dates, y=scen_arr,
                 mode="lines+markers", name="پیش‌بینی میانه تحت سناریوی انتخابی (What-If)",
                 line=dict(color="#dc2626", width=3, dash="dash")
             ))
-        # خطوط آستانه هشدار و بحران
         fig_fan.add_hline(y=warn_thresh, line_dash="dash", line_color="#f59e0b",
                           annotation_text=f"آستانه هشدار ({warn_thresh:.2f} m)", annotation_position="bottom left")
         fig_fan.add_hline(y=crit_thresh, line_dash="dot", line_color="#dc2626",
                           annotation_text=f"آستانه بحرانی ({crit_thresh:.2f} m)", annotation_position="bottom left")
         fig_fan.update_layout(
+            font=dict(family="Vazirmatn, Tahoma"),
             title="نمودار بادبزنی (Fan Chart) پیش‌بینی احتمالاتی ۱۲ ماهه تراز آب دریای خزر (مبنای بالتیک)",
             xaxis_title="تاریخ (میلادی)",
             yaxis_title="تراز سطح آب (m BS)",
@@ -336,18 +410,6 @@ with tab1:
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
         )
         st.plotly_chart(fig_fan, use_container_width=True)
-    else:
-        fig_m, ax_m = plt.subplots(figsize=(14, 5))
-        ax_m.plot(df_hist_sub["Date"], df_hist_sub["CSL_Satellite_Altimetry_m"], color="black", lw=2, label="Observed Sea Level")
-        ax_m.fill_between(f_dates, p10_arr, p90_arr, color="dodgerblue", alpha=0.25, label="P10-P90 Band")
-        ax_m.fill_between(f_dates, p25_arr, p75_arr, color="royalblue", alpha=0.45, label="P25-P75 Band")
-        ax_m.plot(f_dates, p50_arr, color="navy", lw=2.5, marker="o", label="Baseline P50")
-        ax_m.plot(f_dates, scen_arr, color="crimson", lw=2.2, ls="--", label="Scenario P50")
-        ax_m.axhline(warn_thresh, color="darkorange", ls="--", label=f"Warning ({warn_thresh:.2f}m)")
-        ax_m.axhline(crit_thresh, color="red", ls=":", label=f"Critical ({crit_thresh:.2f}m)")
-        ax_m.legend()
-        ax_m.grid(True, ls="--", alpha=0.5)
-        st.pyplot(fig_m)
 
     col_t1_left, col_t1_right = st.columns([1.35, 1.0])
     with col_t1_left:
@@ -359,13 +421,13 @@ with tab1:
         ]
         st.dataframe(
             df_csl_12m[display_csl_cols].assign(Date=lambda d: d["Date"].dt.strftime("%Y-%m-%d")),
-            use_container_width=True, height=420
+            use_container_width=True, height=410
         )
 
     with col_t1_right:
         st.markdown("##### 📊 توزیع احتمالاتی ۱۰۰۰ مسیر مونت‌کارلو در افق ماه انتخابی")
         selected_lead = st.select_slider(
-            "انتخاب ماه افق پیش‌بینی (Lead Month 1 to 12):",
+            "انتخاب ماه افق پیش‌بینی (ماه ۱ تا ۱۲):",
             options=list(range(1, 13)), value=12
         )
         mc_slice = csl_mc_adj[:, selected_lead - 1]
@@ -375,23 +437,19 @@ with tab1:
             fig_hist = go.Figure()
             fig_hist.add_trace(go.Histogram(
                 x=mc_slice, nbinsx=35, name="توزیع ۱۰۰۰ عضو مونت‌کارلو",
-                marker_color="#3b82f6", opacity=0.75
+                marker_color="#3b82f6", opacity=0.78
             ))
             fig_hist.add_vline(x=float(np.percentile(mc_slice, 10)), line_dash="dot", line_color="#1d4ed8", annotation_text="P10")
             fig_hist.add_vline(x=float(np.percentile(mc_slice, 50)), line_dash="solid", line_color="#0f172a", annotation_text="P50")
             fig_hist.add_vline(x=float(np.percentile(mc_slice, 90)), line_dash="dot", line_color="#1d4ed8", annotation_text="P90")
             fig_hist.add_vline(x=crit_thresh, line_dash="dash", line_color="#dc2626", annotation_text="آستانه بحران")
             fig_hist.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
                 title=f"توزیع احتمالاتی تراز در ماه {selected_lead}ام ({target_dt_str})",
                 xaxis_title="تراز سطح آب (m BS)", yaxis_title="فراوانی (از ۱۰۰۰ شبیه‌سازی)",
-                height=350
+                height=340
             )
             st.plotly_chart(fig_hist, use_container_width=True)
-        else:
-            fig_h, ax_h = plt.subplots(figsize=(6, 4))
-            ax_h.hist(mc_slice, bins=30, color="dodgerblue", alpha=0.7, edgecolor="white")
-            ax_h.axvline(crit_thresh, color="red", ls="--", label="Critical")
-            st.pyplot(fig_h)
 
 # ------------------------------------------------------------------------------
 # تب ۲: پیش‌بینی دبی رودخانه‌های ورودی (GloFAS + LSTM) و نقشه مصب‌ها
@@ -444,18 +502,22 @@ with tab2:
                 line=dict(color="#ea580c", width=2.5, dash="dot")
             ))
             fig_q.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
                 xaxis_title="ماه پیش‌بینی", yaxis_title="دبی ورودی کل (m³/s)",
                 height=360, hovermode="x unified"
             )
             st.plotly_chart(fig_q, use_container_width=True)
 
-        st.markdown("##### ⚖️ جدول و نمودار وزن‌دهی پویا (Skill-Based Weights) در افق ۱ تا ۱۲ ماه")
+        st.markdown("##### ⚖️ نمودار وزن‌دهی پویا (Skill-Based Weights) در افق ۱ تا ۱۲ ماه")
         if PLOTLY_AVAILABLE:
             fig_w = go.Figure()
             fig_w.add_trace(go.Bar(x=df_ens_12m["Lead_Month"], y=df_ens_12m["Weight_GloFAS"], name="وزن سامانه GloFAS", marker_color="#ea580c"))
             fig_w.add_trace(go.Bar(x=df_ens_12m["Lead_Month"], y=df_ens_12m["Weight_DL_LSTM"], name="وزن مدل یادگیری عمیق (LSTM)", marker_color="#7c3aed"))
             fig_w.add_trace(go.Bar(x=df_ens_12m["Lead_Month"], y=df_ens_12m["Weight_Climatology"], name="وزن اقلیم‌شناسی پایه", marker_color="#64748b"))
-            fig_w.update_layout(barmode="stack", xaxis_title="افق پیش‌بینی (ماه ۱ تا ۱۲)", yaxis_title="سهم وزن در ترکیب (۰ تا ۱)", height=260)
+            fig_w.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
+                barmode="stack", xaxis_title="افق پیش‌بینی (ماه ۱ تا ۱۲)", yaxis_title="سهم وزن در ترکیب (۰ تا ۱)", height=260
+            )
             st.plotly_chart(fig_w, use_container_width=True)
 
     st.markdown("---")
@@ -474,7 +536,10 @@ with tab2:
             ))
             fig_st.add_trace(go.Scatter(x=df_st_6m["Date"], y=df_st_6m["Q_P50"], mode="lines+markers", name="میانه (P50)", line=dict(color="#c2410c", width=2.5)))
             fig_st.add_trace(go.Scatter(x=df_st_6m["Date"], y=df_st_6m["Q_Mean"], mode="lines", name="میانگین آنسامبل", line=dict(color="#0f172a", dash="dash")))
-            fig_st.update_layout(title=f"هیدروگراف احتمالاتی ۶ ماهه GloFAS برای ایستگاه {sel_station}", yaxis_title="دبی (m³/s)", height=320)
+            fig_st.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
+                title=f"هیدروگراف احتمالاتی ۶ ماهه GloFAS برای ایستگاه {sel_station}", yaxis_title="دبی (m³/s)", height=320
+            )
             st.plotly_chart(fig_st, use_container_width=True)
     with c_st2:
         st.dataframe(df_st_6m.assign(Date=lambda d: d["Date"].dt.strftime("%Y-%m-%d")), use_container_width=True, height=280)
@@ -501,15 +566,18 @@ with tab3:
                 mode="lines+markers", name="تغییر خالص حجم مخزن (ΔV km³)",
                 line=dict(color="#0f172a", width=3)
             ))
-            fig_wb.update_layout(barmode="group", yaxis_title="حجم آب (کیلومترمکعب در ماه)", height=380, hovermode="x unified")
+            fig_wb.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
+                barmode="group", yaxis_title="حجم آب (کیلومترمکعب در ماه)", height=380, hovermode="x unified"
+            )
             st.plotly_chart(fig_wb, use_container_width=True)
 
     with col_b2:
-        st.markdown("##### 📐 جدول و منحنی هیپسومتریک دریای خزر (تراز – مساحت – حجم – قره‌بوغاز)")
+        st.markdown("##### 📐 جدول منحنی هیپسومتریک دریای خزر (تراز – مساحت – حجم – قره‌بوغاز)")
         st.dataframe(df_hypso, use_container_width=True, height=340)
 
     st.markdown("---")
-    st.markdown("##### 🌍 تحلیل همبستگی تاخیری شاخص‌های اقلیمی دورپیوندی (ENSO، NAO و AO) با دبی ولگا و بیلان خزر")
+    st.markdown("##### 🌍 تحلیل همبستگی تاخیری شاخص‌های اقلیمی دورپیوندی (ENSO، NAO و AO) با دبی ولگا")
     col_tc1, col_tc2 = st.columns([1.2, 1.0])
     with col_tc1:
         df_tele_recent = df_master[df_master["Year"] >= 2015]
@@ -518,15 +586,18 @@ with tab3:
             fig_tc.add_trace(go.Scatter(x=df_tele_recent["Date"], y=df_tele_recent["ENSO_Nino34"], name="ENSO (Niño 3.4)", line=dict(color="#dc2626", width=2)))
             fig_tc.add_trace(go.Scatter(x=df_tele_recent["Date"], y=df_tele_recent["NAO"], name="NAO Index", line=dict(color="#059669", width=1.6)))
             fig_tc.add_trace(go.Scatter(x=df_tele_recent["Date"], y=df_tele_recent["AO"], name="AO Index", line=dict(color="#4f46e5", width=1.6)))
-            fig_tc.update_layout(title="سری زمانی شاخص‌های دورپیوندی (۲۰۱۵ تا ۲۰۲۶)", yaxis_title="مقدار شاخص استاندارد", height=340)
+            fig_tc.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
+                title="سری زمانی شاخص‌های دورپیوندی (۲۰۱۵ تا ۲۰۲۶)", yaxis_title="مقدار شاخص استاندارد", height=340
+            )
             st.plotly_chart(fig_tc, use_container_width=True)
     with col_tc2:
         if PLOTLY_AVAILABLE:
             fig_lag = px.bar(
                 df_lag_corr, x="Lag_Months", y="Corr_with_Volga_Q", color="Teleconnection",
-                barmode="group", title="ضریب همبستگی تاخیری (Lag 1–12 Months) با دبی رودخانه ولگا"
+                barmode="group", title="ضریب همبستگی تاخیری (تاخیر ۱ تا ۱۲ ماه) با دبی رودخانه ولگا"
             )
-            fig_lag.update_layout(height=340)
+            fig_lag.update_layout(font=dict(family="Vazirmatn, Tahoma"), height=340)
             st.plotly_chart(fig_lag, use_container_width=True)
 
 # ------------------------------------------------------------------------------
@@ -549,7 +620,10 @@ with tab4:
             fig_rmse.add_trace(go.Scatter(x=df_skill["Lead_Month"], y=df_skill["CSL_RMSE_Hybrid_cm"], mode="lines+markers", name="سامانه ترکیبی (GloFAS + LSTM)", line=dict(color="#1e3a8a", width=3)))
             fig_rmse.add_trace(go.Scatter(x=df_skill["Lead_Month"], y=df_skill["CSL_RMSE_Climatology_cm"], mode="lines+markers", name="مدل مرجع اقلیم‌شناسی (Climatology)", line=dict(color="#059669", dash="dash", width=2.2)))
             fig_rmse.add_trace(go.Scatter(x=df_skill["Lead_Month"], y=df_skill["CSL_RMSE_Persistence_cm"], mode="lines+markers", name="مدل مرجع پایداری (Persistence)", line=dict(color="#dc2626", dash="dot", width=2.2)))
-            fig_rmse.update_layout(title="مقایسه خطای RMSE پیش‌بینی تراز دریای خزر (سانتی‌متر) در افق‌های ۱ تا ۱۲ ماه", xaxis_title="افق پیش‌بینی (ماه)", yaxis_title="RMSE (cm)", height=380)
+            fig_rmse.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
+                title="مقایسه خطای RMSE پیش‌بینی تراز دریای خزر (سانتی‌متر) در افق‌های ۱ تا ۱۲ ماه", xaxis_title="افق پیش‌بینی (ماه)", yaxis_title="RMSE (cm)", height=380
+            )
             st.plotly_chart(fig_rmse, use_container_width=True)
 
     with col_sk2:
@@ -557,26 +631,28 @@ with tab4:
             fig_ss = go.Figure()
             fig_ss.add_trace(go.Bar(x=df_skill["Lead_Month"], y=df_skill["CSL_Skill_vs_Persistence (%)"], name="بهبود Skill نسبت به پایداری (%)", marker_color="#2563eb"))
             fig_ss.add_trace(go.Bar(x=df_skill["Lead_Month"], y=df_skill["CSL_Skill_vs_Climatology (%)"], name="بهبود Skill نسبت به اقلیم‌شناسی (%)", marker_color="#10b981"))
-            fig_ss.update_layout(barmode="group", title="درصد ارتقای کارایی (Skill Score %) سامانه نسبت به مدل‌های پایه", xaxis_title="افق پیش‌بینی (ماه)", yaxis_title="Skill Score (%)", height=380)
+            fig_ss.update_layout(
+                font=dict(family="Vazirmatn, Tahoma"),
+                barmode="group", title="درصد ارتقای کارایی (Skill Score %) سامانه نسبت به مدل‌های پایه", xaxis_title="افق پیش‌بینی (ماه)", yaxis_title="Skill Score (%)", height=380
+            )
             st.plotly_chart(fig_ss, use_container_width=True)
 
     st.markdown("##### 📊 جدول کامل شاخص‌های ارزیابی پس‌نگر (RMSE، MAE، NSE و Skill Score) در افق‌های ۱ تا ۱۲ ماهه")
     st.dataframe(df_skill, use_container_width=True, height=420)
 
 # ------------------------------------------------------------------------------
-# تب ۵: درگاه یکپارچه‌سازی ملی (API / JSON / GeoJSON / NetCDF) و گزارش فصلی خودکار
+# تب ۵: درگاه دانلود گزارش فصلی خودکار و خروجی‌های یکپارچه‌سازی ملی (API)
 # ------------------------------------------------------------------------------
 with tab5:
     st.markdown(
         """
         <div class="rtl-box">
-        <b>یکپارچه‌سازی با سامانه‌های ملی و تولید گزارش‌های دوره‌ای خودکار:</b> مطابق بخش ۴-۴ پروپوزال، تمامی خروجی‌های سامانه در قالب فرمت‌های استاندارد وب‌سرویس (<b>REST JSON</b>، <b>GeoJSON</b>، <b>NetCDF</b> و <b>CSV</b>) و همچنین <b>گزارش مدیریتی فصلی خودکار</b> از طریق درگاه زیر قابل دریافت و تبادل مستقیم هستند.
+        <b>یکپارچه‌سازی با سامانه‌های ملی و تولید گزارش‌های دوره‌ای خودکار:</b> مطابق بخش ۴-۴ پروپوزال، تمامی خروجی‌های سامانه در قالب فرمت‌های استاندارد تبادل داده (<b>JSON</b>، <b>GeoJSON</b> و <b>CSV</b>) و همچنین <b>گزارش مدیریتی فصلی خودکار (قابل چاپ به PDF)</b> از طریق دکمه‌های زیر قابل دریافت مستقیم هستند.
         </div>
         """,
         unsafe_allow_html=True
     )
 
-    # ساخت JSON استاندارد وب‌سرویس به صورت داینامیک
     api_payload = {
         "system": "Caspian Sea 12-Month Probabilistic Forecasting System (Phase 2)",
         "generated_at": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -593,7 +669,6 @@ with tab5:
     }
     json_bytes = json.dumps(api_payload, indent=2, ensure_ascii=False).encode("utf-8")
 
-    # ساخت GeoJSON مصب رودخانه‌ها
     geojson_obj = {
         "type": "FeatureCollection",
         "features": [
@@ -607,7 +682,6 @@ with tab5:
     }
     geojson_bytes = json.dumps(geojson_obj, indent=2, ensure_ascii=False).encode("utf-8")
 
-    # ساخت گزارش مدیریتی فصلی خودکار (HTML قابل چاپ به PDF در مرورگر)
     html_report = f"""
     <!DOCTYPE html>
     <html lang="fa" dir="rtl">
@@ -615,11 +689,12 @@ with tab5:
         <meta charset="UTF-8">
         <title>گزارش فصلی پیش‌بینی ۱۲ ماهه تراز آب دریای خزر</title>
         <style>
-            body {{ font-family: Tahoma, Arial, sans-serif; margin: 35px; color: #1e293b; line-height: 1.7; }}
+            @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;700&display=swap');
+            body {{ font-family: 'Vazirmatn', Tahoma, sans-serif; margin: 35px; color: #1e293b; line-height: 1.8; }}
             h1, h2 {{ color: #0f172a; border-bottom: 2px solid #1d4ed8; padding-bottom: 6px; }}
-            .summary-box {{ background: #f1f5f9; padding: 15px; border-right: 5px solid #1d4ed8; margin-bottom: 20px; }}
+            .summary-box {{ background: #f1f5f9; padding: 16px 20px; border-right: 5px solid #1d4ed8; border-radius: 8px; margin-bottom: 22px; }}
             table {{ width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }}
-            th, td {{ border: 1px solid #cbd5e1; padding: 8px; text-align: center; }}
+            th, td {{ border: 1px solid #cbd5e1; padding: 9px; text-align: center; }}
             th {{ background-color: #1e3a8a; color: white; }}
         </style>
     </head>
@@ -645,36 +720,73 @@ with tab5:
     dl_col1, dl_col2, dl_col3, dl_col4 = st.columns(4)
     with dl_col1:
         st.download_button(
-            label="📥 دانلود خروجی وب‌سرویس (JSON API)",
-            data=json_bytes,
-            file_name="caspian_12m_forecast_api.json",
-            mime="application/json",
-            use_container_width=True
-        )
-    with dl_col2:
-        st.download_button(
-            label="🗺️ دانلود لایه مکانی مصب‌ها (GeoJSON)",
-            data=geojson_bytes,
-            file_name="caspian_river_outlets.geojson",
-            mime="application/geo+json",
-            use_container_width=True
-        )
-    with dl_col3:
-        st.download_button(
-            label="📊 دانلود جدول پیش‌بینی ۱۲ ماهه (CSV)",
-            data=df_csl_12m.to_csv(index=False).encode("utf-8"),
-            file_name="Caspian_12M_Probabilistic_Forecast.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-    with dl_col4:
-        st.download_button(
-            label="📄 دانلود گزارش فصلی خودکار (HTML/PDF)",
+            label="📄 ۱. دانلود گزارش فصلی خودکار (HTML/PDF)",
             data=html_report.encode("utf-8"),
             file_name="Caspian_Seasonal_Executive_Report.html",
             mime="text/html",
             use_container_width=True
         )
+    with dl_col2:
+        st.download_button(
+            label="📊 ۲. دانلود جدول پیش‌بینی ۱۲ ماهه (CSV)",
+            data=df_csl_12m.to_csv(index=False).encode("utf-8"),
+            file_name="Caspian_12M_Probabilistic_Forecast.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+    with dl_col3:
+        st.download_button(
+            label="🗺️ ۳. دانلود لایه مکانی مصب‌ها (GeoJSON)",
+            data=geojson_bytes,
+            file_name="caspian_river_outlets.geojson",
+            mime="application/geo+json",
+            use_container_width=True
+        )
+    with dl_col4:
+        st.download_button(
+            label="📥 ۴. دانلود خروجی وب‌سرویس (JSON API)",
+            data=json_bytes,
+            file_name="caspian_12m_forecast_api.json",
+            mime="application/json",
+            use_container_width=True
+        )
 
-    st.markdown("##### 💻 پیش‌نمایش زنده خروجی استاندارد REST API (JSON Payload جهت اتصال به سامانه‌های ملی)")
-    st.json(api_payload, expanded=False)
+    st.markdown("##### 📌 خلاصه مدیریتی فصلی (۴ فصل پیش‌رو بر اساس خروجی مدل ۱۲ ماهه)")
+    df_seasonal_summary = pd.DataFrame([
+        {
+            "فصل پیش‌بینی": "پاییز (اکتبر تا دسامبر ۲۰۲۶)",
+            "افق زمانی": "ماه‌های ۱ تا ۳",
+            "حجم ورودی رودخانه‌ها (km³)": round(float(df_csl_12m.iloc[0:3]["Inflow_Vol_km3"].sum()), 2),
+            "خالص بارش منهای تبخیر (km³)": round(float(df_csl_12m.iloc[0:3]["Net_PE_Vol_km3"].sum()), 2),
+            "تراز میانه پایان فصل P50 (m BS)": float(df_csl_12m.iloc[2]["Scenario_P50_m"]),
+            "بازه عدم‌قطعیت P10 تا P90 (m BS)": f"{df_csl_12m.iloc[2]['Scenario_P10_m']:.3f} تا {df_csl_12m.iloc[2]['Scenario_P90_m']:.3f}",
+        },
+        {
+            "فصل پیش‌بینی": "زمستان (ژانویه تا مارس ۲۰۲۷)",
+            "افق زمانی": "ماه‌های ۴ تا ۶",
+            "حجم ورودی رودخانه‌ها (km³)": round(float(df_csl_12m.iloc[3:6]["Inflow_Vol_km3"].sum()), 2),
+            "خالص بارش منهای تبخیر (km³)": round(float(df_csl_12m.iloc[3:6]["Net_PE_Vol_km3"].sum()), 2),
+            "تراز میانه پایان فصل P50 (m BS)": float(df_csl_12m.iloc[5]["Scenario_P50_m"]),
+            "بازه عدم‌قطعیت P10 تا P90 (m BS)": f"{df_csl_12m.iloc[5]['Scenario_P10_m']:.3f} تا {df_csl_12m.iloc[5]['Scenario_P90_m']:.3f}",
+        },
+        {
+            "فصل پیش‌بینی": "بهار (آوریل تا ژوئن ۲۰۲۷ - اوج سیلاب ولگا)",
+            "افق زمانی": "ماه‌های ۷ تا ۹",
+            "حجم ورودی رودخانه‌ها (km³)": round(float(df_csl_12m.iloc[6:9]["Inflow_Vol_km3"].sum()), 2),
+            "خالص بارش منهای تبخیر (km³)": round(float(df_csl_12m.iloc[6:9]["Net_PE_Vol_km3"].sum()), 2),
+            "تراز میانه پایان فصل P50 (m BS)": float(df_csl_12m.iloc[8]["Scenario_P50_m"]),
+            "بازه عدم‌قطعیت P10 تا P90 (m BS)": f"{df_csl_12m.iloc[8]['Scenario_P10_m']:.3f} تا {df_csl_12m.iloc[8]['Scenario_P90_m']:.3f}",
+        },
+        {
+            "فصل پیش‌بینی": "تابستان (ژوئیه تا سپتامبر ۲۰۲۷ - اوج تبخیر)",
+            "افق زمانی": "ماه‌های ۱۰ تا ۱۲",
+            "حجم ورودی رودخانه‌ها (km³)": round(float(df_csl_12m.iloc[9:12]["Inflow_Vol_km3"].sum()), 2),
+            "خالص بارش منهای تبخیر (km³)": round(float(df_csl_12m.iloc[9:12]["Net_PE_Vol_km3"].sum()), 2),
+            "تراز میانه پایان فصل P50 (m BS)": float(df_csl_12m.iloc[11]["Scenario_P50_m"]),
+            "بازه عدم‌قطعیت P10 تا P90 (m BS)": f"{df_csl_12m.iloc[11]['Scenario_P10_m']:.3f} تا {df_csl_12m.iloc[11]['Scenario_P90_m']:.3f}",
+        },
+    ])
+    st.dataframe(df_seasonal_summary, use_container_width=True)
+
+    with st.expander("💻 مشاهده ساختار فنی بسته وب‌سرویس (REST API JSON Payload ویژه اتصال به سامانه‌های ملی)"):
+        st.json(api_payload, expanded=False)
